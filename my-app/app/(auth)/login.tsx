@@ -1,7 +1,7 @@
 import { router } from 'expo-router';
 import React, { useState } from 'react';
 import { View, Text, TextInput, TouchableOpacity, StyleSheet, Pressable } from 'react-native';
-
+import {login} from "../../api";
 
 const Login: React.FC = () => {
     const [form, setForm] = useState({
@@ -16,6 +16,12 @@ const Login: React.FC = () => {
         }));
         console.log(form);
     };
+
+    const handleSubmit = async () => {
+        const loginResponse = await login(form);
+
+        console.log(loginResponse);
+    }
 
     return (
         <View style={styles.container}>
@@ -37,7 +43,7 @@ const Login: React.FC = () => {
                     secureTextEntry
                 />
             </View>
-            <TouchableOpacity style={styles.button}>
+            <TouchableOpacity onPress={handleSubmit} style={styles.button}>
                 <Text style={styles.buttonText}>Login</Text>
             </TouchableOpacity>
             <Pressable style={styles.pressable} onPress={() => router.push({
@@ -45,6 +51,8 @@ const Login: React.FC = () => {
             })}>
                 <Text style={styles.text}>Don't have an account? <Text style={styles.highlightedText}>Register</Text></Text>
             </Pressable>
+
+        
         </View>
     );
 };

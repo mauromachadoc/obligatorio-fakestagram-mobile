@@ -4,11 +4,13 @@ import { useNavigation } from '@react-navigation/native';
 import { router } from 'expo-router';
 
 const Index: React.FC = () => {
+    useEffect(() => { 
+        const isAuthenticated = false;
 
-    const isAuthenticated = false;
-    if (!isAuthenticated) {
-        router.push({ pathname: '/login' });
-    }
+        if (!isAuthenticated) {
+            router.push({ pathname: '/login' });
+        }
+    }, []);
 
     return (
         <View>
