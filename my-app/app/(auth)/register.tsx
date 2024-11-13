@@ -60,7 +60,7 @@ const Register: React.FC = () => {
                 <Text style={styles.buttonText}>Login</Text>
             </TouchableOpacity>
             <Pressable style={styles.pressable} onPress={() => router.push({
-                pathname: '/login',
+                pathname: 'login',
             })}>
                 <Text style={styles.text}>Already have an account? <Text style={styles.highlightedText}>Log in</Text></Text>
             </Pressable>
