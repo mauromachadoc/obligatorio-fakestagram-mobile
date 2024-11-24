@@ -1,5 +1,5 @@
-import { useLocalSearchParams } from "expo-router";
-import { Image, StyleSheet, Text, View } from "react-native";
+import { router, useLocalSearchParams } from "expo-router";
+import { Image, StyleSheet, Text, View, Pressable } from "react-native";
 import { CreateIcon } from "@/assets/images/create";
 import { NotificationIcon } from "@/assets/images/Notification";
 
@@ -8,12 +8,18 @@ const Header = () => {
 
   const title = params.title || 'Home';
 
+  const handlePressCreate = () => {
+    router.push('/createPost')
+  }
+
   return (
     <View style={styles.header}>
       <Text style={styles.title}>{title}</Text>
       <View style={styles.iconContainer}>
         <NotificationIcon />
-        <CreateIcon />
+        <Pressable onPress={handlePressCreate} >
+          <CreateIcon />
+        </Pressable>
       </View>
     </View>
   );
