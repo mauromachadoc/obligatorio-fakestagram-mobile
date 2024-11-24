@@ -4,6 +4,7 @@ import * as MediaLibrary from 'expo-media-library';
 import * as ImageManipulator from 'expo-image-manipulator';
 import * as FileSystem from 'expo-file-system';
 import { router, useNavigation } from 'expo-router';
+import { addPost } from '@/api/post';
 
 export default function CreatePost() {
   const [images, setImages] = useState([]);
@@ -87,8 +88,6 @@ export default function CreatePost() {
   };
 
   const handleSubmit = async (selectedImage, description) => {
-    console.log({ selectedImage, description });
-
     if (!selectedImage || !description) {
       Alert.alert("Error", "Por favor, selecciona una imagen y escribe una descripción.");
       return;
@@ -105,16 +104,9 @@ export default function CreatePost() {
     formData.append("caption", description);
 
     try {
-      const response = await fetch("http://192.168.1.32:3001/api/posts/upload", {
-        method: "POST",
-        headers: {
-          "Content-Type": "multipart/form-data",
-          "Authorization": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY3MzI2N2E4ZWMzYzBhMjAyY2Y3MzQ1ZiIsImlhdCI6MTczMTM1Njg1OCwiZXhwIjoxNzMzOTQ4ODU4fQ.qtMmuQ5LaBnE7NHTOLPwLzAK8d_uOsoDiUT2tsL7Me0"
-        },
-        body: formData,
-      });
+      const response = await addPost(formData);
 
-      if (response.ok) {
+      if (response) {
         router.push('/');
         Alert.alert("Exito", "Post subido correctamente.");
         setSelectedImage(null);
@@ -123,6 +115,7 @@ export default function CreatePost() {
         Alert.alert("Error", "Un error ocurrió mientras se subía el post.");
       }
     } catch (error) {
+      console.error("Error subiendo el post:", error);
       Alert.alert("Error", "Un error ocurrió mientras se subía el post.");
     }
   };

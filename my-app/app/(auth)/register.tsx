@@ -16,7 +16,6 @@ const Register: React.FC = () => {
             ...prev,
             [name]: value,
         }));
-        console.log(form);
     };
 
     return (

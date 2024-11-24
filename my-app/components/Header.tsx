@@ -43,6 +43,7 @@ const styles = StyleSheet.create({
   iconContainer: {
     width: '20%',
     overflow: 'visible',
+    gap: 16,
     flexDirection: 'row',
   },
 });

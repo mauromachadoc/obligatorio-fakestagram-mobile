@@ -8,6 +8,7 @@ import { Text } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { withDecay } from 'react-native-reanimated';
 import Header from '@/components/Header';
+import { HomeIcon } from '@/assets/images/Home';
 
 export default function TabLayout() {
   const colorScheme = useColorScheme();
@@ -17,28 +18,26 @@ export default function TabLayout() {
       <Header />
       <Tabs
         screenOptions={{
-          tabBarActiveTintColor: Colors[colorScheme ?? 'light'].tint,
           headerShown: false,
           tabBarStyle: {
             backgroundColor: Colors[colorScheme ?? 'light'].background,
             paddingBottom: 0,
-            height: 60,
+            height: 50,
           },
+          tabBarShowLabel: false,
         }}
         >
         <Tabs.Screen
           name="index"
           options={{
-            title: 'Home',
             tabBarIcon: ({ color, focused }) => (
-              <TabBarIcon name={focused ? 'home' : 'home-outline'} color={color} />
+              <HomeIcon />
             ),
           }}
         />
         <Tabs.Screen
           name="profile"
           options={{
-            title: 'Profile',
             tabBarIcon: ({ color, focused }) => (
               <TabBarIcon name={focused ? 'person' : 'person-outline'} color={color} />
             ),
