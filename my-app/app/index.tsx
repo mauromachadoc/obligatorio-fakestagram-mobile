@@ -1,22 +1,35 @@
-import React, { useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import { View, Text } from 'react-native';
-import { useNavigation } from '@react-navigation/native';
-import { router } from 'expo-router';
+import { useRouter } from 'expo-router';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
-const Index: React.FC = () => {
-    useEffect(() => { 
-        const isAuthenticated = false;
+export default function Index() {
+  const [isMounted, setIsMounted] = useState(false);
+  const router = useRouter();
 
-        if (!isAuthenticated) {
-            router.push({ pathname: '/login' });
-        }
-    }, []);
+  useEffect(() => {
+    setIsMounted(true);
+  }, []);
 
-    return (
-        <View>
-            <Text>Welcome to the App!</Text>
-        </View>
-    );
-};
+  const getUser = async () => {
+    const user = await AsyncStorage.getItem('user');
 
-export default Index;
+    if (!user) {
+      router.push({ pathname: '/login' });
+    } else {
+      router.push({ pathname: '/(tabs)' });
+    }
+  }
+
+  useEffect(() => {
+    if (isMounted) {
+      getUser();
+    }
+  }, [isMounted]);
+
+  return (
+    <View>
+      <Text>Welcome to the app!</Text>
+    </View>
+  );
+}
