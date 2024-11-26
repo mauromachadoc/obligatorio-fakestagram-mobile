@@ -1,5 +1,5 @@
 import { Tabs } from 'expo-router';
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 
 import { TabBarIcon } from '@/components/navigation/TabBarIcon';
 import { Colors } from '@/constants/Colors';
@@ -9,12 +9,14 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { withDecay } from 'react-native-reanimated';
 import Header from '@/components/Header';
 import { HomeIcon } from '@/assets/images/Home';
+import AvatarIcon from '@/assets/images/userIcon';
+import { getItem } from '@/helpers/asyncStorage';
 
 export default function TabLayout() {
   const colorScheme = useColorScheme();
 
   return (
-    <SafeAreaView style={{height: '100%'}}>
+    <SafeAreaView style={{ height: '100%' }}>
       <Header />
       <Tabs
         screenOptions={{
@@ -26,12 +28,12 @@ export default function TabLayout() {
           },
           tabBarShowLabel: false,
         }}
-        >
+      >
         <Tabs.Screen
           name="index"
           options={{
             tabBarIcon: ({ color, focused }) => (
-              <HomeIcon />
+              <HomeIcon fill={color} />
             ),
           }}
         />
@@ -39,7 +41,7 @@ export default function TabLayout() {
           name="profile/[id]"
           options={{
             tabBarIcon: ({ color, focused }) => (
-              <TabBarIcon name={focused ? 'person' : 'person-outline'} color={color} />
+              <AvatarIcon width={30} height={30} color={color} />
             ),
           }}
         />

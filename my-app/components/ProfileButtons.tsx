@@ -1,8 +1,14 @@
-import React from 'react';
+import React, { FC } from 'react';
 import { View, TouchableOpacity, Text, StyleSheet } from 'react-native';
-import ShowEditButton from './ShowEditButton';
 
-const ProfileButtons = ({ profileId, userAdded, handleAddUser, handleEditProfile }) => {
+type ProfileButtonsProps = {
+  profileId: string;
+  userAdded: boolean;
+  handleAddUser: () => void;
+  handleEditProfile: () => void;
+};
+
+const ProfileButtons: FC<ProfileButtonsProps> = ({ profileId, userAdded, handleAddUser, handleEditProfile }) => {
 
   return (
     <View style={styles.profileButtons}>
@@ -11,7 +17,9 @@ const ProfileButtons = ({ profileId, userAdded, handleAddUser, handleEditProfile
           <Text style={styles.buttonText}>{userAdded ? 'Desagregar' : 'Agregar'}</Text>
         </TouchableOpacity>
       ) : (
-        <ShowEditButton handleEditProfile={handleEditProfile} />
+        <TouchableOpacity style={styles.button} onPress={() => handleEditProfile()}>
+          <Text style={styles.buttonText}>Editar</Text>
+        </TouchableOpacity>
       )}
     </View>
   );

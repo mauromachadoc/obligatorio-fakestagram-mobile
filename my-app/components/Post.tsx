@@ -7,6 +7,7 @@ import { HeartIcon } from "@/assets/images/HeathIcon";
 import { router } from "expo-router";
 import { addLike, removeLike } from "@/api/post";
 import { getItem } from "@/helpers/asyncStorage";
+import AvatarIcon from "@/assets/images/userIcon";
 
 interface CommentType {
   _id: string;
@@ -96,7 +97,7 @@ const Post: FC<PostProps> = ({
   return (
     <View style={styles.post}>
       <TouchableOpacity style={styles.header} onPress={handleGoToProfile}>
-        <Image style={styles.avatar} source={{ uri: profilePicture }} />
+        <AvatarIcon style={styles.avatar} color='black' customUrl={profilePicture} otherProfile />
         <Text style={styles.username}>{username}</Text>
       </TouchableOpacity>
 

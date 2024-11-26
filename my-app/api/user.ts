@@ -10,7 +10,7 @@ export const profileById = async (id: string) => {
     console.log(error)
   }
 }
-export const updateProfile = async (id: string, data: any) => {
+export const updateProfile = async (data: any) => {
   const response = await api.put(`/user/profile/edit`, { ...data });
 
   return response.data;

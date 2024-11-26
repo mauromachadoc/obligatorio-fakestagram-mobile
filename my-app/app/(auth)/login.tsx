@@ -23,6 +23,10 @@ const Login: React.FC = () => {
       const loginResponse = await login(form);
 
       AsyncStorage.setItem('user', JSON.stringify(loginResponse));
+
+      router.push({
+        pathname: '/',
+      });
     } catch (error) {
       console.error('Error logging in:', error);
     }
@@ -37,6 +41,7 @@ const Login: React.FC = () => {
           value={form.email}
           onChangeText={(text) => handleChange('email', text)}
           placeholder="Email Address"
+          autoCapitalize='none'
         />
       </View>
       <View style={styles.field}>
