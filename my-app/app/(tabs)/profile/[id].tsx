@@ -1,6 +1,10 @@
-import React, { useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import { View, Text, TextInput, Image, StyleSheet, FlatList, TouchableOpacity, Alert } from 'react-native';
-import { profileById, updateProfile } from '../../api'; 
+import { addFriend, profileById, removeFriend, updateProfile } from '@/api/user'
+import { useAsyncStorage } from '@react-native-async-storage/async-storage';
+import { getItem } from '@/helpers/asyncStorage';
+import { useGlobalSearchParams, useNavigation, useFocusEffect } from 'expo-router';
+import { useData } from '@/contexts/userData';
 
 const Profile = () => {
   const [profileInfo, setProfileInfo] = useState({
@@ -15,23 +19,38 @@ const Profile = () => {
     posts: [],
   });
 
+  const {
+    id,
+  } = useGlobalSearchParams()
+
+  const navigation = useNavigation();
+
+  const { setData } = useData();
+
   const [isEditing, setIsEditing] = useState(false);
   const [username, setUsername] = useState('');
   const [profilePicture, setProfilePicture] = useState('');
-  
-  const API_URL = process.env.VITE_API_URL;
+  const [userAdded, setUserAdded] = useState(false);
+
+  const API_URL = process.env.EXPO_PUBLIC_API_URL;
 
   const fetchProfile = async () => {
-    const user = localStorage.getItem('user'); 
-    const profile = await profileById(JSON.parse(user)._id);
+    const user = await getItem('user');
+
+    const profile = await profileById(id || user?._id);
+
     setProfileInfo(profile);
     setUsername(profile.user.username);
     setProfilePicture(profile.user.profilePicture);
+    setUserAdded(profile.user.friends.find(friend => friend._id === user._id));
+    setData({
+      title: profile.user.username,
+    })
   };
 
   const handleEditProfile = async () => {
     try {
-      const user = localStorage.getItem('user'); 
+      const user = localStorage.getItem('user');
       await updateProfile(JSON.parse(user)._id, { username, profilePicture });
       setProfileInfo((prev) => ({
         ...prev,
@@ -45,9 +64,56 @@ const Profile = () => {
     }
   };
 
-  useEffect(() => {
-    fetchProfile();
-  }, []);
+  const handleAddUser = async () => {
+    try {
+      if (userAdded) {
+        await removeFriend(user._id);
+
+        setProfileInfo(prev => ({
+          ...prev,
+          user: {
+            ...prev.user,
+            friends: prev.user.friends.filter(friend => friend._id !== user._id)
+          }
+        }));
+      } else {
+        await addFriend(user._id);
+
+        setProfileInfo(prev => ({
+          ...prev,
+          user: {
+            ...prev.user,
+            friends: [...prev.user.friends, user]
+          }
+        }));
+      }
+
+      setUserAdded((prev) => !prev);
+    } catch (error) {
+      console.error("Error al agregar amigo", error);
+    }
+  }
+
+  useFocusEffect(
+    useCallback(() => {
+      fetchProfile();
+
+      return () => {
+        navigation.setParams({ id: '' });
+        setProfileInfo({
+          user: {
+            id: '',
+            username: '',
+            profilePicture: '',
+            email: '',
+            createdAt: '',
+            friends: [],
+          },
+          posts: [],
+        });
+      };
+    }, [id])
+  );
 
   return (
     <View style={styles.container}>
@@ -76,32 +142,19 @@ const Profile = () => {
             />
           )}
         </View>
-        <View style={styles.buttons}>
-          {isEditing ? (
-            <>
-              <TouchableOpacity style={styles.button} onPress={handleEditProfile}>
-                <Text style={styles.buttonText}>Guardar</Text>
-              </TouchableOpacity>
-              <TouchableOpacity style={styles.button} onPress={() => setIsEditing(false)}>
-                <Text style={styles.buttonText}>Cancelar</Text>
-              </TouchableOpacity>
-            </>
-          ) : (
-            <TouchableOpacity style={styles.button} onPress={() => setIsEditing(true)}>
-              <Text style={styles.buttonText}>Editar</Text>
-            </TouchableOpacity>
-          )}
-        </View>
+
       </View>
       <FlatList
         data={profileInfo.posts}
         keyExtractor={(item, index) => index.toString()}
         numColumns={3}
-        renderItem={({ item }) => (
-          <View style={styles.postContainer}>
-            <Image source={{ uri: `${API_URL}/${item.imageUrl}` }} style={styles.postImage} />
-          </View>
-        )}
+        renderItem={({ item }) => {
+          return (
+            <View style={styles.postContainer}>
+              <Image source={{ uri: `${API_URL}/${item.imageUrl}` }} style={styles.postImage} />
+            </View>
+          )
+        }}
         style={styles.gallery}
       />
     </View>

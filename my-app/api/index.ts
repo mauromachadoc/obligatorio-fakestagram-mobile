@@ -4,7 +4,7 @@ import { getItem } from "@/helpers/asyncStorage";
 const apiUrl = process.env.EXPO_PUBLIC_API_URL;
 
 const api = axios.create({
-  baseURL: apiUrl,
+  baseURL: `${apiUrl}/api`,
 });
 
 api.interceptors.request.use(

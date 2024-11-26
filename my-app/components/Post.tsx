@@ -8,7 +8,7 @@ import { router } from "expo-router";
 import { addLike, removeLike } from "@/api/post";
 import { getItem } from "@/helpers/asyncStorage";
 
-interface Comment {
+interface CommentType {
   _id: string;
   content: string;
 }
@@ -18,14 +18,25 @@ interface PostProps {
   imageUrl: string;
   description: string;
   username: string;
-  comments: Comment[];
+  comments: CommentType[];
   profilePicture: string;
+  likes: string[];
 }
 
-const Post: FC<PostProps> = ({ id, username, imageUrl, description, comments: commentsFromBack, profilePicture, likes: likesFromBack }) => {
+const Post: FC<PostProps> = ({
+  id,
+  username,
+  imageUrl,
+  description,
+  comments: commentsFromBack,
+  profilePicture,
+  userId: postUserId,
+  likes: likesFromBack
+}) => {
+  const API_URL = process.env.EXPO_PUBLIC_API_URL;
   const [likes, setLikes] = useState(likesFromBack.length);
   const [isLiked, setIsLiked] = useState(false);
-  const [comments, setComments] = useState<Comment[]>(commentsFromBack);
+  const [comments, setComments] = useState<CommentType[]>(commentsFromBack);
   const [newComment, setNewComment] = useState('');
   const [showCommentInput, setShowCommentInput] = useState(false);
   const [showComments, setShowComments] = useState(false);
@@ -54,10 +65,6 @@ const Post: FC<PostProps> = ({ id, username, imageUrl, description, comments: co
     }
   }
 
-  const handleCommentButton = () => {
-    setShowCommentInput(!showCommentInput);
-  };
-
   const handleAddComment = async (e: React.FormEvent) => {
     e.preventDefault();
     if (newComment.trim()) {
@@ -70,7 +77,7 @@ const Post: FC<PostProps> = ({ id, username, imageUrl, description, comments: co
   };
 
   const handleGoToProfile = () => {
-    router.push(`/profile/${id}`);
+    router.push(`/profile/${postUserId}`);
   }
 
   const handleDeleteComment = async (commentId: string) => {
@@ -88,12 +95,12 @@ const Post: FC<PostProps> = ({ id, username, imageUrl, description, comments: co
 
   return (
     <View style={styles.post}>
-      <TouchableOpacity style={styles.header}>
+      <TouchableOpacity style={styles.header} onPress={handleGoToProfile}>
         <Image style={styles.avatar} source={{ uri: profilePicture }} />
         <Text style={styles.username}>{username}</Text>
       </TouchableOpacity>
 
-      <Image style={styles.postImage} source={{ uri: `http://192.168.1.32:3001/${imageUrl}` }} />
+      <Image style={styles.postImage} source={{ uri: `${API_URL}/${imageUrl}` }} />
 
       <View style={styles.content}>
         <View style={styles.actions}>
@@ -168,6 +175,7 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     marginBottom: 10,
+    paddingHorizontal: 20,
   },
   content: {
     flexDirection: "column",
@@ -175,8 +183,8 @@ const styles = StyleSheet.create({
     paddingTop: 10,
   },
   avatar: {
-    width: 40,
-    height: 40,
+    width: 30,
+    height: 30,
     borderRadius: 20,
     marginRight: 10,
   },

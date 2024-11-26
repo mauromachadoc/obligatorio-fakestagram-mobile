@@ -1,9 +1,14 @@
 import api from ".";
 
 export const profileById = async (id: string) => {
-  const response = await api.get(`/user/profile/${id}`);
+  try {
 
-  return response.data;
+    const response = await api.get(`/user/profile/${id}`);
+
+    return response.data;
+  } catch (error) {
+    console.log(error)
+  }
 }
 export const updateProfile = async (id: string, data: any) => {
   const response = await api.put(`/user/profile/edit`, { ...data });

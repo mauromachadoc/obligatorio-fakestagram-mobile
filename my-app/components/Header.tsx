@@ -1,12 +1,14 @@
-import { router, useLocalSearchParams } from "expo-router";
+import { router, useLocalSearchParams, useNavigation } from "expo-router";
 import { Image, StyleSheet, Text, View, Pressable } from "react-native";
 import { CreateIcon } from "@/assets/images/create";
 import { NotificationIcon } from "@/assets/images/Notification";
+import { useData } from "@/contexts/userData";
+import { useRoute } from "@react-navigation/native";
 
 const Header = () => {
-  const params = useLocalSearchParams();
+  const { data } = useData();
 
-  const title = params.title || 'Home';
+  const title = data.title || 'home';
 
   const handlePressCreate = () => {
     router.push('/createPost')

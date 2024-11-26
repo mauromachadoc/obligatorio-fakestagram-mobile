@@ -9,6 +9,7 @@ export default function HomeScreen() {
 
   const fetchFeed = async () => {
     const getFeed = await feed();
+
     setPosts(getFeed);
   };
 
@@ -26,6 +27,7 @@ export default function HomeScreen() {
             imageUrl={item.imageUrl}
             description={item.caption}
             username={item.user.username}
+            userId={item.user._id}
             comments={item.comments}
             likes={item.likes}
             profilePicture={item.user.profilePicture}
