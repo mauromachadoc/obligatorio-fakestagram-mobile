@@ -18,7 +18,9 @@ const Header = () => {
     <View style={styles.header}>
       <Text style={styles.title}>{title}</Text>
       <View style={styles.iconContainer}>
-        <NotificationIcon />
+        <Pressable onPress={() => router.push('/notifications')}>
+          <NotificationIcon />
+        </Pressable>
         <Pressable onPress={handlePressCreate} >
           <CreateIcon />
         </Pressable>
