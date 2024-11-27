@@ -3,9 +3,9 @@ import { StyleSheet } from 'react-native';
 import { feed } from '../../api/post';
 import Post from '@/components/Post';
 import { FlatList, GestureHandlerRootView } from 'react-native-gesture-handler';
-import { removeItem } from '@/helpers/asyncStorage';
+import { getItem, removeItem } from '@/helpers/asyncStorage';
 import { useData } from '@/contexts/userData';
-import { useFocusEffect } from 'expo-router';
+import { router, useFocusEffect } from 'expo-router';
 
 export default function HomeScreen() {
   const [posts, setPosts] = useState([]);
@@ -17,6 +17,15 @@ export default function HomeScreen() {
 
     setPosts(getFeed);
   };
+
+  useEffect(() => {
+    const user = getItem('user');
+
+    if (!user) {
+      removeItem('user');
+      router.navigate('/login')
+    }
+  }, []);
 
   useFocusEffect(
     useCallback(() => {

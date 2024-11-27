@@ -3,7 +3,6 @@ import { router } from 'expo-router';
 import React, { useState } from 'react';
 import { View, Text, TextInput, TouchableOpacity, StyleSheet, Pressable } from 'react-native';
 
-
 const Register: React.FC = () => {
   const [form, setForm] = useState({
     email: '',

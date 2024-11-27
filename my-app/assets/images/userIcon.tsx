@@ -39,7 +39,7 @@ const AvatarIcon = ({
   return (
     customUrl || imageUrl ? (
       <Image
-        source={{ uri: imageUrl || customUrl }}
+        source={{ uri: customUrl || imageUrl }}
         style={{ width, height, borderRadius: 50, ...style }}
       />
     ) : (

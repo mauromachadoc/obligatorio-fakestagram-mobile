@@ -1,6 +1,6 @@
 import { router } from 'expo-router';
 import React, { useState } from 'react';
-import { View, Text, TextInput, TouchableOpacity, StyleSheet, Pressable } from 'react-native';
+import { View, Text, TextInput, TouchableOpacity, StyleSheet, Pressable, Alert } from 'react-native';
 
 import { login } from "../../api/auth";
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -28,7 +28,7 @@ const Login: React.FC = () => {
         pathname: '/',
       });
     } catch (error) {
-      console.error('Error logging in:', error);
+      Alert.alert('Error', 'Hubo un problema al iniciar sesión');
     }
   }
 

@@ -36,6 +36,11 @@ const Profile = () => {
   const fetchProfile = async () => {
     const user = await getItem('user');
 
+    if (!user) {
+      router.navigate('/login');
+      return;
+    }
+
     const profile = await profileById(id || user?._id);
 
     setProfileInfo(profile);
