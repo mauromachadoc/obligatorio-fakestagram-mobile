@@ -1,5 +1,5 @@
-import React, { FC, useEffect, useState } from "react";
-import { View, Text, Image, TextInput, TouchableOpacity, FlatList, StyleSheet, GestureResponderEvent } from "react-native";
+import React, { FC, useEffect, useRef, useState } from "react";
+import { View, Text, Image, TextInput, TouchableOpacity, FlatList, StyleSheet, GestureResponderEvent, TouchableWithoutFeedback } from "react-native";
 import { addComment, deleteComment } from "../api/post";
 import { Comment } from "@/assets/images/Comment";
 import { HeartIcon } from "@/assets/images/HeathIcon";
@@ -39,6 +39,7 @@ const Post: FC<PostProps> = ({
   const [showCommentInput, setShowCommentInput] = useState(false);
   const [showComments, setShowComments] = useState(false);
   const [userId, setUserId] = useState('');
+  const lastTap = useRef(null);
 
   const handleLike = async () => {
     if (isLiked) {
@@ -86,6 +87,16 @@ const Post: FC<PostProps> = ({
     setShowComments(!showComments);
   };
 
+  const handleDoubleTap = () => {
+    const now = Date.now();
+    const DOUBLE_PRESS_DELAY = 300;
+    if (lastTap.current && (now - lastTap.current) < DOUBLE_PRESS_DELAY) {
+      handleLike();
+    } else {
+      lastTap.current = now;
+    }
+  };
+
   useEffect(() => {
     isLikedByUser();
   }, []);
@@ -97,7 +108,9 @@ const Post: FC<PostProps> = ({
         <Text style={styles.username}>{username}</Text>
       </TouchableOpacity>
 
-      <Image style={styles.postImage} source={{ uri: `${API_URL}/${imageUrl}` }} />
+      <TouchableWithoutFeedback onPress={handleDoubleTap}>
+        <Image style={styles.postImage} source={{ uri: `${API_URL}/${imageUrl}` }} />
+      </TouchableWithoutFeedback>
 
       <View style={styles.content}>
         <View style={styles.actions}>

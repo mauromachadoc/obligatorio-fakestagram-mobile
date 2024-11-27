@@ -1,17 +1,18 @@
-import React, { useCallback, useEffect, useState } from 'react';
-import { StyleSheet } from 'react-native';
-import { feed } from '../../api/post';
+import React, { useState, useCallback, useEffect } from 'react';
+import { View, FlatList, StyleSheet } from 'react-native';
+import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import Post from '@/components/Post';
-import { FlatList, GestureHandlerRootView } from 'react-native-gesture-handler';
+import { Post as PostType } from '@/types';
+import { feed } from '@/api/post';
+import { router, useFocusEffect } from 'expo-router';
 import { getItem, removeItem } from '@/helpers/asyncStorage';
 import { useData } from '@/contexts/userData';
-import { router, useFocusEffect } from 'expo-router';
-import { Post as PostType } from '@/types';
 
-export default function HomeScreen() {
-  const [posts, setPosts] = useState([]);
-
+const HomeScreen = () => {
+  const [posts, setPosts] = useState<PostType[]>([]);
+  const [refreshing, setRefreshing] = useState(false);
   const { setData } = useData();
+
 
   const fetchFeed = async () => {
     const getFeed = await feed();
@@ -19,17 +20,21 @@ export default function HomeScreen() {
     setPosts(getFeed);
   };
 
-  useEffect(() => {
-    const user = getItem('user');
-
-    if (!user) {
-      removeItem('user');
-      router.navigate('/login')
-    }
+  const onRefresh = useCallback(async () => {
+    setRefreshing(true);
+    await fetchFeed();
+    setRefreshing(false);
   }, []);
 
   useFocusEffect(
     useCallback(() => {
+      const user = getItem('user');
+
+      if (!user) {
+        removeItem('user');
+        router.navigate('/login')
+      }
+
       fetchFeed();
       setData({
         title: 'Inicio',
@@ -41,9 +46,7 @@ export default function HomeScreen() {
     <GestureHandlerRootView style={styles.container}>
       <FlatList
         data={posts}
-        renderItem={({ item }: {
-          item: PostType
-        }) => (
+        renderItem={({ item }: { item: PostType }) => (
           <Post
             id={item._id}
             imageUrl={item.imageUrl}
@@ -57,10 +60,12 @@ export default function HomeScreen() {
         )}
         keyExtractor={(item) => item._id}
         style={styles.posts}
+        refreshing={refreshing}
+        onRefresh={onRefresh}
       />
     </GestureHandlerRootView>
   );
-}
+};
 
 const styles = StyleSheet.create({
   container: {
@@ -74,3 +79,5 @@ const styles = StyleSheet.create({
     width: '100%',
   },
 });
+
+export default HomeScreen;
