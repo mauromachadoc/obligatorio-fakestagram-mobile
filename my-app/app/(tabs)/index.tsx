@@ -1,11 +1,16 @@
-import React, { useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import { StyleSheet } from 'react-native';
 import { feed } from '../../api/post';
 import Post from '@/components/Post';
 import { FlatList, GestureHandlerRootView } from 'react-native-gesture-handler';
+import { removeItem } from '@/helpers/asyncStorage';
+import { useData } from '@/contexts/userData';
+import { useFocusEffect } from 'expo-router';
 
 export default function HomeScreen() {
   const [posts, setPosts] = useState([]);
+
+  const { setData } = useData();
 
   const fetchFeed = async () => {
     const getFeed = await feed();
@@ -13,9 +18,14 @@ export default function HomeScreen() {
     setPosts(getFeed);
   };
 
-  useEffect(() => {
-    fetchFeed();
-  }, []);
+  useFocusEffect(
+    useCallback(() => {
+      fetchFeed();
+      setData({
+        title: 'Inicio',
+      })
+    }, [])
+  );
 
   return (
     <GestureHandlerRootView style={styles.container}>

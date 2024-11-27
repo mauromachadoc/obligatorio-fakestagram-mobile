@@ -32,7 +32,7 @@ export default function RootLayout() {
     <ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
       <DataProvider>
         <Stack screenOptions={{ headerTitleAlign: 'center' }}>
-          <Stack.Screen name="index" />
+          <Stack.Screen name="index" options={{ headerShown: false }} />
           <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
           <Stack.Screen name="(auth)" options={{ headerShown: false }} />
           <Stack.Screen name="+not-found" />
@@ -43,6 +43,17 @@ export default function RootLayout() {
               headerRight: () => (
                 <TouchableOpacity onPress={() => navigation.navigate('CreatePost')}>
                   <Text style={{ marginLeft: 10, color: '#007AFF', fontSize: 20 }}>Subir Post</Text>
+                </TouchableOpacity>
+              ),
+            })}
+          />
+          <Stack.Screen name="editProfile"
+            options={({ navigation }) => ({
+              headerBackTitle: 'Cerrar',
+              title: 'Editar Perfil',
+              headerRight: () => (
+                <TouchableOpacity onPress={() => navigation.navigate('CreatePost')}>
+                  <Text style={{ marginLeft: 10, color: '#007AFF', fontSize: 16 }}>Editar Perfil</Text>
                 </TouchableOpacity>
               ),
             })}

@@ -1,10 +1,13 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
+import { CameraView, CameraType, useCameraPermissions, Camera } from 'expo-camera';
+
 import { Button, Text, SafeAreaView, ScrollView, StyleSheet, Image, View, TouchableOpacity, TextInput, Alert, Pressable, FlatList } from 'react-native';
 import * as MediaLibrary from 'expo-media-library';
 import * as ImageManipulator from 'expo-image-manipulator';
 import * as FileSystem from 'expo-file-system';
 import { router, useNavigation } from 'expo-router';
 import { addPost } from '@/api/post';
+import { Ionicons } from '@expo/vector-icons';
 
 export default function CreatePost() {
   const [images, setImages] = useState([]);
@@ -12,6 +15,11 @@ export default function CreatePost() {
   const [description, setDescription] = useState("");
   const [permissionResponse, requestPermission] = MediaLibrary.usePermissions();
   const [page, setPage] = useState(1);
+  const cameraRef = useRef(null);
+
+  const [facing, setFacing] = useState<'back' | 'front'>('back');
+  const [useCamera, setUseCamera] = useState(false);
+  const [permission, requestCameraPermission] = useCameraPermissions();
 
   const navigation = useNavigation();
 
@@ -62,6 +70,7 @@ export default function CreatePost() {
       return uri;
     }
   };
+
   const compressImage = async (uri) => {
     try {
       const manipResult = await ImageManipulator.manipulateAsync(
@@ -84,6 +93,7 @@ export default function CreatePost() {
   }, [permissionResponse, page]);
 
   const handleSelectImage = async (uri) => {
+    setUseCamera(false);
     setSelectedImage(uri);
   };
 
@@ -120,7 +130,16 @@ export default function CreatePost() {
     }
   };
 
+  const handleUseCamera = () => {
+    setUseCamera((prev) => !prev);
+  }
+
+  const handleFlipCamera = () => {
+    setFacing((prev) => prev === 'back' ? 'front' : 'back');
+  };
+
   useEffect(() => {
+    requestCameraPermission();
     requestPermission();
   }, []);
 
@@ -136,21 +155,55 @@ export default function CreatePost() {
 
   return (
     <SafeAreaView style={styles.container}>
-      <View style={styles.selectedImageContainer}>
-        <Image source={{ uri: selectedImage || 'https://developers.elementor.com/docs/assets/img/elementor-placeholder-image.png' }} style={styles.selectedImage} />
-      </View>
-      <View style={styles.titleContainer}>
-        <View style={styles.inputContainer}>
-          <Text>
-            Descripcion:
-          </Text>
-          <TextInput
-            style={styles.input}
-            placeholder="Description"
-            onChangeText={setDescription}
-            value={description}
-          />
-        </View>
+      {
+        useCamera ? (
+          <View style={styles.selectedImageContainer}>
+            <CameraView
+              facing={facing}
+              style={styles.selectedImage}
+              ref={cameraRef}
+              onPictureTaken={(photo) => {
+                setSelectedImage(photo.uri);
+                setUseCamera(false);
+              }}
+            >
+              <Pressable
+                onPress={() => cameraRef?.current?.takePictureAsync?.()
+                  .then(photo => {
+                    setSelectedImage(photo.uri);
+                    setUseCamera(false);
+                  })}
+                style={styles.takePictureButton}
+              >
+                <Ionicons name="camera" size={24} color="white" />
+              </Pressable>
+              <Pressable
+                onPress={handleFlipCamera}
+                style={styles.flipCameraButton}
+              >
+                <Ionicons name="camera-reverse" size={24} color="white" />
+              </Pressable>
+            </CameraView>
+          </View>
+        ) : (
+          <View style={styles.selectedImageContainer}>
+            <Pressable onPress={handleUseCamera} style={styles.camera}>
+              <Ionicons name="camera" size={24} color="white" />
+            </Pressable>
+            <Image source={{ uri: selectedImage || 'https://developers.elementor.com/docs/assets/img/elementor-placeholder-image.png' }} style={styles.selectedImage} />
+          </View>
+        )
+      }
+      <View style={styles.inputContainer}>
+        <Text>
+          Descripcion:
+        </Text>
+        <TextInput
+          style={styles.input}
+          placeholder="Description"
+          onChangeText={setDescription}
+          value={description}
+        />
       </View>
       <FlatList
         data={images}
@@ -185,6 +238,12 @@ const styles = StyleSheet.create({
     flexWrap: 'wrap',
     justifyContent: 'center',
   },
+  camera: {
+    position: 'absolute',
+    top: 20,
+    right: 20,
+    zIndex: 2,
+  },
   imageThumbnail: {
     width: 100,
     height: 100,
@@ -214,10 +273,8 @@ const styles = StyleSheet.create({
     borderColor: '#ccc',
     borderWidth: 1,
     borderRadius: 8,
-    marginBottom: 16,
   },
   inputContainer: {
-    marginBottom: 16,
     gap: 8,
     width: '80%',
   },
@@ -230,6 +287,16 @@ const styles = StyleSheet.create({
   },
   buttonText: {
     color: '#007AFF',
-    fontSize: 20
+    fontSize: 16
+  },
+  takePictureButton: {
+    position: 'absolute',
+    bottom: 20,
+    left: '50%',
+  },
+  flipCameraButton: {
+    position: 'absolute',
+    bottom: 20,
+    right: 20,
   },
 });
