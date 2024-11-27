@@ -13,13 +13,19 @@ export const addComment = async (postId: string, content: string) => {
 }
 
 export const addPost = async (data: any) => {
-  const response = await api.post('/posts/upload', data, {
-    headers: {
-      'Content-Type': 'multipart/form-data',
-    },
-  });
+  try {
+    console.log(data);
+    const response = await api.post('/posts/upload', data, {
+      headers: {
+        'Content-Type': 'multipart/form-data',
+      },
+    });
 
-  return response.data;
+    return response.data;
+  } catch (error) {
+    console.error(error);
+    throw error;
+  }
 }
 
 export const deleteComment = async (postId: string, commentId: string) => {

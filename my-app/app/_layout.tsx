@@ -41,7 +41,7 @@ export default function RootLayout() {
               headerBackTitle: 'Cerrar',
               title: 'Crear Post',
               headerRight: () => (
-                <TouchableOpacity onPress={() => navigation.navigate('createPost')}>
+                <TouchableOpacity onPressIn={() => navigation.navigate('createPost')}>
                   <Text style={{ marginLeft: 10, color: '#007AFF', fontSize: 20 }}>Subir Post</Text>
                 </TouchableOpacity>
               ),
