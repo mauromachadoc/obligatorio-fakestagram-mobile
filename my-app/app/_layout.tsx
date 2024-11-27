@@ -41,7 +41,7 @@ export default function RootLayout() {
               headerBackTitle: 'Cerrar',
               title: 'Crear Post',
               headerRight: () => (
-                <TouchableOpacity onPress={() => navigation.navigate('CreatePost')}>
+                <TouchableOpacity onPressIn={() => navigation.navigate('createPost')}>
                   <Text style={{ marginLeft: 10, color: '#007AFF', fontSize: 20 }}>Subir Post</Text>
                 </TouchableOpacity>
               ),
@@ -58,6 +58,7 @@ export default function RootLayout() {
               ),
             })}
           />
+          <Stack.Screen name='notifications' options={{ headerShown: false }} />
         </Stack>
       </DataProvider>
     </ThemeProvider>

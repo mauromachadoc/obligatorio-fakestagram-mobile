@@ -113,6 +113,8 @@ export default function CreatePost() {
     });
     formData.append("caption", description);
 
+    console.log(formData);
+
     try {
       const response = await addPost(formData);
 
@@ -146,9 +148,9 @@ export default function CreatePost() {
   useEffect(() => {
     navigation.setOptions({
       headerRight: () => (
-        <Pressable onPress={() => handleSubmit(selectedImage, description)}>
+        <TouchableOpacity onPressIn={() => handleSubmit(selectedImage, description)}>
           <Text style={styles.buttonText}>Subir Post</Text>
-        </Pressable>
+        </TouchableOpacity>
       ),
     });
   }, [selectedImage, description]);
