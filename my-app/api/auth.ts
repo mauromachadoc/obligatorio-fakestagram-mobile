@@ -14,12 +14,8 @@ export const register = async (data: any) => {
 export const login = async (data: any) => {
   const response = await api.post('/auth/login', data);
 
-  console.log(response.data);
-
   if (response.data.token) {
-    console.log('setting token');
     await setItem('token', response.data.token);
-    console.log('token set');
   }
 
   return response.data;

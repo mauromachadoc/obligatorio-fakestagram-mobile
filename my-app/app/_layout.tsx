@@ -9,7 +9,6 @@ import { useColorScheme } from '@/hooks/useColorScheme';
 import { Text, TouchableOpacity } from 'react-native';
 import { DataProvider } from '@/contexts/userData';
 
-// Prevent the splash screen from auto-hiding before asset loading is complete.
 SplashScreen.preventAutoHideAsync();
 
 export default function RootLayout() {
@@ -29,38 +28,39 @@ export default function RootLayout() {
   }
 
   return (
-    <ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
-      <DataProvider>
-        <Stack screenOptions={{ headerTitleAlign: 'center' }}>
-          <Stack.Screen name="index" options={{ headerShown: false }} />
-          <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
-          <Stack.Screen name="(auth)" options={{ headerShown: false }} />
-          <Stack.Screen name="+not-found" />
-          <Stack.Screen name="createPost"
-            options={({ navigation }) => ({
-              headerBackTitle: 'Cerrar',
-              title: 'Crear Post',
-              headerRight: () => (
-                <TouchableOpacity onPressIn={() => navigation.navigate('createPost')}>
-                  <Text style={{ marginLeft: 10, color: '#007AFF', fontSize: 20 }}>Subir Post</Text>
-                </TouchableOpacity>
-              ),
-            })}
-          />
-          <Stack.Screen name="editProfile"
-            options={({ navigation }) => ({
-              headerBackTitle: 'Cerrar',
-              title: 'Editar Perfil',
-              headerRight: () => (
-                <TouchableOpacity onPress={() => navigation.navigate('CreatePost')}>
-                  <Text style={{ marginLeft: 10, color: '#007AFF', fontSize: 16 }}>Editar Perfil</Text>
-                </TouchableOpacity>
-              ),
-            })}
-          />
-          <Stack.Screen name='notifications' options={{ headerShown: false }} />
-        </Stack>
-      </DataProvider>
-    </ThemeProvider>
+    <DataProvider>
+      <Stack screenOptions={{ headerTitleAlign: 'center' }}>
+        <Stack.Screen name="index" options={{ headerShown: false }} />
+        <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
+        <Stack.Screen name="(auth)" options={{ headerShown: false }} />
+        <Stack.Screen name="+not-found" />
+        <Stack.Screen name="profile/[id]" options={{
+          headerBackTitle: 'Cerrar',
+        }} />
+        <Stack.Screen name="createPost"
+          options={({ navigation }) => ({
+            headerBackTitle: 'Cerrar',
+            title: 'Crear Post',
+            headerRight: () => (
+              <TouchableOpacity onPressIn={() => navigation.navigate('createPost')}>
+                <Text style={{ marginLeft: 10, color: '#007AFF', fontSize: 20 }}>Subir Post</Text>
+              </TouchableOpacity>
+            ),
+          })}
+        />
+        <Stack.Screen name="editProfile"
+          options={({ navigation }) => ({
+            headerBackTitle: 'Cerrar',
+            title: 'Editar Perfil',
+            headerRight: () => (
+              <TouchableOpacity onPress={() => navigation.navigate('CreatePost')}>
+                <Text style={{ marginLeft: 10, color: '#007AFF', fontSize: 16 }}>Editar Perfil</Text>
+              </TouchableOpacity>
+            ),
+          })}
+        />
+        <Stack.Screen name='notifications' options={{ headerShown: false }} />
+      </Stack>
+    </DataProvider>
   );
 }

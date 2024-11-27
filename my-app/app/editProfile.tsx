@@ -5,10 +5,15 @@ import { router, useNavigation } from 'expo-router';
 import React, { useEffect, useState } from 'react';
 import { View, Text, TextInput, TouchableOpacity, StyleSheet, Pressable, Image, Alert } from 'react-native';
 
-const EditProfile: React.FC = () => {
+type Form = {
+  profilePicture: string;
+  username: string;
+};
+
+const EditProfile = () => {
   const navigate = useNavigation();
 
-  const [form, setForm] = useState({
+  const [form, setForm] = useState<Form>({
     profilePicture: '',
     username: '',
   });
@@ -26,7 +31,7 @@ const EditProfile: React.FC = () => {
     setForm(user);
   }
 
-  const handleSubmit = async (form) => {
+  const handleSubmit = async (form: Form) => {
     try {
       await updateProfile(form);
 

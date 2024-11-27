@@ -1,17 +1,22 @@
 import React, { useCallback, useEffect, useState } from 'react';
-import { View, Text, TextInput, Image, StyleSheet, FlatList, TouchableOpacity, Alert } from 'react-native';
+import { View, Text, TextInput, Image, StyleSheet, FlatList, TouchableOpacity, Alert, Pressable } from 'react-native';
 import { addFriend, profileById, removeFriend, updateProfile } from '@/api/user'
 import { useAsyncStorage } from '@react-native-async-storage/async-storage';
-import { getItem } from '@/helpers/asyncStorage';
+import { getItem, removeItem } from '@/helpers/asyncStorage';
 import { useGlobalSearchParams, useNavigation, useFocusEffect, router } from 'expo-router';
 import { useData } from '@/contexts/userData';
 import ProfileButtons from '@/components/ProfileButtons';
 import AvatarIcon from '@/assets/images/userIcon';
+import { Ionicons } from '@expo/vector-icons';
+import { Post, User } from '@/types';
 
 const Profile = () => {
-  const [profileInfo, setProfileInfo] = useState({
+  const [profileInfo, setProfileInfo] = useState<{
+    user: User,
+    posts: Post[],
+  }>({
     user: {
-      id: '',
+      _id: '',
       username: '',
       profilePicture: '',
       email: '',
@@ -23,6 +28,8 @@ const Profile = () => {
 
   const {
     id,
+  }: {
+    id: string
   } = useGlobalSearchParams()
 
   const navigation = useNavigation();
@@ -44,8 +51,11 @@ const Profile = () => {
     const profile = await profileById(id || user?._id);
 
     setProfileInfo(profile);
-    setUserAdded(profile.user.friends.find(friend => friend._id === user._id));
+    setUserAdded(profile.user.friends.find((friend: User) => friend._id === user._id));
     setData({
+      title: profile.user.username,
+    })
+    navigation.setOptions({
       title: profile.user.username,
     })
   };
@@ -53,6 +63,11 @@ const Profile = () => {
   const handleEditProfile = async () => {
     router.navigate('/editProfile');
   };
+
+  const handleLogout = async () => {
+    await removeItem('user');
+    router.navigate('/login');
+  }
 
   const handleAddUser = async () => {
     try {
@@ -71,7 +86,7 @@ const Profile = () => {
       } else {
         await addFriend(profileInfo.user._id);
 
-        setProfileInfo(prev => ({
+        setProfileInfo((prev) => ({
           ...prev,
           user: {
             ...prev.user,
@@ -89,21 +104,6 @@ const Profile = () => {
   useFocusEffect(
     useCallback(() => {
       fetchProfile();
-
-      return () => {
-        navigation.setParams({ id: '' });
-        setProfileInfo({
-          user: {
-            id: '',
-            username: '',
-            profilePicture: '',
-            email: '',
-            createdAt: '',
-            friends: [],
-          },
-          posts: [],
-        });
-      };
     }, [id])
   );
 
@@ -112,7 +112,7 @@ const Profile = () => {
       <View style={styles.header}>
 
         <View style={styles.avatar}>
-          <AvatarIcon width={80} height={80} color='black' customUrl={profileInfo.user.profilePicture} />
+          <AvatarIcon width={80} height={80} color='black' customUrl={profileInfo.user.profilePicture} otherProfile={!!id} />
         </View>
 
         <View style={styles.info}>
@@ -125,6 +125,13 @@ const Profile = () => {
             userAdded={userAdded}
             handleEditProfile={handleEditProfile}
           />
+          {
+            !id && (
+              <Pressable onPress={handleLogout}>
+                <Ionicons name="log-out" size={24} color="black" />
+              </Pressable>
+            )
+          }
         </View>
 
       </View>

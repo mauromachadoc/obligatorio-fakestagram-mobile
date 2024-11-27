@@ -1,101 +1,51 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { CameraView, CameraType, useCameraPermissions, Camera } from 'expo-camera';
 
-import { Button, Text, SafeAreaView, ScrollView, StyleSheet, Image, View, TouchableOpacity, TextInput, Alert, Pressable, FlatList } from 'react-native';
-import * as MediaLibrary from 'expo-media-library';
-import * as ImageManipulator from 'expo-image-manipulator';
-import * as FileSystem from 'expo-file-system';
+import {
+  Text,
+  SafeAreaView,
+  StyleSheet,
+  Image,
+  View,
+  TouchableOpacity,
+  TextInput,
+  Alert,
+  Pressable,
+  FlatList
+} from 'react-native';
+
 import { router, useNavigation } from 'expo-router';
 import { addPost } from '@/api/post';
 import { Ionicons } from '@expo/vector-icons';
+import { useImagePermissions } from '@/hooks/useImagePermissions';
 
 export default function CreatePost() {
-  const [images, setImages] = useState([]);
-  const [selectedImage, setSelectedImage] = useState(null);
-  const [description, setDescription] = useState("");
-  const [permissionResponse, requestPermission] = MediaLibrary.usePermissions();
-  const [page, setPage] = useState(1);
-  const cameraRef = useRef(null);
-
   const [facing, setFacing] = useState<'back' | 'front'>('back');
   const [useCamera, setUseCamera] = useState(false);
-  const [permission, requestCameraPermission] = useCameraPermissions();
+  const [description, setDescription] = useState("");
+
+  const {
+    page,
+    setPage,
+    handleSelectImage,
+    setSelectedImage,
+    selectedImage,
+    images,
+  } = useImagePermissions({
+    setUseCamera,
+  })
 
   const navigation = useNavigation();
 
-  const fetchImages = async () => {
-    try {
-      const albumAssets = await MediaLibrary.getAssetsAsync({
-        first: 10,
-        after: images.length > 0 ? images[images.length - 1].id : undefined,
-        mediaType: 'photo',
-      });
+  const cameraRef = useRef(null);
 
-      const imagePromises = await Promise.all(albumAssets.assets.map(async (asset) => {
-        const localUri = await getLocalUri(asset.id);
-        const compressedUri = await compressImage(localUri);
-
-        return { id: asset.id, uri: compressedUri };
-      }));
-
-      setImages([...images, ...imagePromises].filter((image, index, self) => self.findIndex((t) => t.id === image.id) === index));
-    } catch (error) {
-      Alert.alert("Error", "Error al cargar las imágenes.");
-    }
+  const handleFlipCamera = () => {
+    setFacing((prev) => prev === 'back' ? 'front' : 'back');
   };
 
-  const getLocalUri = async (id) => {
-    try {
-      const assetInfo = await MediaLibrary.getAssetInfoAsync(id);
-
-      if (!assetInfo) {
-        throw new Error('Asset info is null');
-      }
-      const localUri = assetInfo.localUri || assetInfo.uri;
-
-      const fileInfo = await FileSystem.getInfoAsync(localUri);
-
-      if (!fileInfo.exists) {
-        const downloadResumable = FileSystem.createDownloadResumable(
-          localUri,
-          FileSystem.documentDirectory + 'photo.jpg'
-        );
-        const { uri: downloadedUri } = await downloadResumable.downloadAsync();
-        return downloadedUri;
-      } else {
-        return localUri;
-      }
-    } catch (error) {
-      console.error("Error getting local URI:", error);
-      return uri;
-    }
-  };
-
-  const compressImage = async (uri) => {
-    try {
-      const manipResult = await ImageManipulator.manipulateAsync(
-        uri,
-        [{ resize: { width: 300 } }],
-        { compress: 1, format: ImageManipulator.SaveFormat.JPEG }
-      );
-
-      return manipResult.uri;
-    } catch (error) {
-      console.error("Error comprimiendo la imagen:", error);
-      return uri;
-    }
-  };
-
-  useEffect(() => {
-    if (permissionResponse?.status === 'granted') {
-      fetchImages(page);
-    }
-  }, [permissionResponse, page]);
-
-  const handleSelectImage = async (uri) => {
-    setUseCamera(false);
-    setSelectedImage(uri);
-  };
+  const handleUseCamera = () => {
+    setUseCamera((prev) => !prev);
+  }
 
   const handleSubmit = async (selectedImage, description) => {
     if (!selectedImage || !description) {
@@ -113,15 +63,13 @@ export default function CreatePost() {
     });
     formData.append("caption", description);
 
-    console.log(formData);
-
     try {
       const response = await addPost(formData);
 
       if (response) {
         router.push('/');
         Alert.alert("Exito", "Post subido correctamente.");
-        setSelectedImage(null);
+        setSelectedImage('');
         setDescription("");
       } else {
         Alert.alert("Error", "Un error ocurrió mientras se subía el post.");
@@ -131,19 +79,6 @@ export default function CreatePost() {
       Alert.alert("Error", "Un error ocurrió mientras se subía el post.");
     }
   };
-
-  const handleUseCamera = () => {
-    setUseCamera((prev) => !prev);
-  }
-
-  const handleFlipCamera = () => {
-    setFacing((prev) => prev === 'back' ? 'front' : 'back');
-  };
-
-  useEffect(() => {
-    requestCameraPermission();
-    requestPermission();
-  }, []);
 
   useEffect(() => {
     navigation.setOptions({

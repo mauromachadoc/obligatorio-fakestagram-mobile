@@ -6,6 +6,7 @@ import { FlatList, GestureHandlerRootView } from 'react-native-gesture-handler';
 import { getItem, removeItem } from '@/helpers/asyncStorage';
 import { useData } from '@/contexts/userData';
 import { router, useFocusEffect } from 'expo-router';
+import { Post as PostType } from '@/types';
 
 export default function HomeScreen() {
   const [posts, setPosts] = useState([]);
@@ -40,7 +41,9 @@ export default function HomeScreen() {
     <GestureHandlerRootView style={styles.container}>
       <FlatList
         data={posts}
-        renderItem={({ item }) => (
+        renderItem={({ item }: {
+          item: PostType
+        }) => (
           <Post
             id={item._id}
             imageUrl={item.imageUrl}

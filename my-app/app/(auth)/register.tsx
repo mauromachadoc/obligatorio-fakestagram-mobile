@@ -1,7 +1,7 @@
 import { register } from '@/api/auth';
 import { router } from 'expo-router';
 import React, { useState } from 'react';
-import { View, Text, TextInput, TouchableOpacity, StyleSheet, Pressable } from 'react-native';
+import { View, Text, TextInput, TouchableOpacity, StyleSheet, Pressable, GestureResponderEvent } from 'react-native';
 
 const Register: React.FC = () => {
   const [form, setForm] = useState({
@@ -18,7 +18,7 @@ const Register: React.FC = () => {
     }));
   };
 
-  const handleSubmit = async (e: React.MouseEvent<HTMLButtonElement>) => {
+  const handleSubmit = async (e: GestureResponderEvent) => {
     try {
       e.preventDefault();
 
@@ -73,7 +73,7 @@ const Register: React.FC = () => {
         <Text style={styles.buttonText}>Login</Text>
       </TouchableOpacity>
       <Pressable style={styles.pressable} onPress={() => router.push({
-        pathname: 'login',
+        pathname: '/login',
       })}>
         <Text style={styles.text}>Already have an account? <Text style={styles.highlightedText}>Log in</Text></Text>
       </Pressable>

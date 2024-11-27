@@ -1,5 +1,5 @@
 import React, { FC, useEffect, useState } from "react";
-import { View, Text, Image, TextInput, TouchableOpacity, FlatList, StyleSheet } from "react-native";
+import { View, Text, Image, TextInput, TouchableOpacity, FlatList, StyleSheet, GestureResponderEvent } from "react-native";
 import { addComment, deleteComment } from "../api/post";
 import { Comment } from "@/assets/images/Comment";
 import { HeartIcon } from "@/assets/images/HeathIcon";
@@ -8,11 +8,7 @@ import { router } from "expo-router";
 import { addLike, removeLike } from "@/api/post";
 import { getItem } from "@/helpers/asyncStorage";
 import AvatarIcon from "@/assets/images/userIcon";
-
-interface CommentType {
-  _id: string;
-  content: string;
-}
+import { Comment as CommentType, Likes } from "@/types";
 
 interface PostProps {
   id: string;
@@ -21,7 +17,8 @@ interface PostProps {
   username: string;
   comments: CommentType[];
   profilePicture: string;
-  likes: string[];
+  userId: string;
+  likes: Likes[];
 }
 
 const Post: FC<PostProps> = ({
@@ -66,8 +63,7 @@ const Post: FC<PostProps> = ({
     }
   }
 
-  const handleAddComment = async (e: React.FormEvent) => {
-    e.preventDefault();
+  const handleAddComment = async () => {
     if (newComment.trim()) {
       const addedComment = await addComment(id, newComment);
 
@@ -78,7 +74,7 @@ const Post: FC<PostProps> = ({
   };
 
   const handleGoToProfile = () => {
-    router.push(`/profile/${postUserId}`);
+    router.navigate(`/profile/${postUserId}`);
   }
 
   const handleDeleteComment = async (commentId: string) => {

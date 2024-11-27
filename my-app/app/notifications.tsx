@@ -1,17 +1,18 @@
 import React, { FC, useEffect, useState } from "react";
-import { View, Text, StyleSheet, FlatList, TouchableOpacity } from "react-native";
+import { View, Text, StyleSheet, FlatList, TouchableOpacity, SafeAreaView } from "react-native";
 import { useRouter } from "expo-router";
-import Notification from "../components/notification"; 
 import { getNotifications } from "../api/notifications";
+import { Notification as NotificationType } from "@/types";
+import Notification from "@/components/notification";
 
 interface NotificationsProps {
-  isOpen: boolean; 
+  isOpen: boolean;
   setIsOpen: (isOpen: boolean) => void;
 }
 
 const Notifications: FC<NotificationsProps> = () => {
   const router = useRouter();
-  const [notifications, setNotifications] = useState([]);
+  const [notifications, setNotifications] = useState<NotificationType[]>([]);
 
   const handleGetNotifications = async () => {
     const response = await getNotifications();
@@ -22,21 +23,12 @@ const Notifications: FC<NotificationsProps> = () => {
     handleGetNotifications();
   }, []);
 
-  const renderNotification = ({ item }: { item: any }) => (
-    <Notification
-      profilePic={item.fromUserId.profilePicture}
-      type={item.type}
-      createdAt={item.createdAt}
-      userFrom={item.fromUserId}
-    />
-  );
-
   const closeNotifications = () => {
     router.back();
   };
 
   return (
-    <View style={styles.container}>
+    <SafeAreaView style={styles.container}>
       <View style={styles.header}>
         <Text style={styles.title}>Notifications</Text>
         <TouchableOpacity onPress={closeNotifications}>
@@ -44,12 +36,20 @@ const Notifications: FC<NotificationsProps> = () => {
         </TouchableOpacity>
       </View>
       <FlatList
-        data={notifications}
-        renderItem={renderNotification}
+        data={notifications.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())}
+        renderItem={({ item }: { item: NotificationType }) => (
+          <Notification
+            profilePic={item?.fromUserId?.profilePicture}
+            type={item.type}
+            createdAt={item.createdAt}
+            userFrom={item?.fromUserId}
+            postId={item?.postId}
+          />
+        )}
         keyExtractor={(item, index) => `${item._id || index}`}
         contentContainerStyle={styles.notificationsList}
       />
-    </View>
+    </SafeAreaView>
   );
 };
 
@@ -59,7 +59,6 @@ const styles = StyleSheet.create({
     backgroundColor: "#fff",
   },
   header: {
-    paddingTop: 40,
     paddingBottom: 10,
     paddingHorizontal: 20,
     borderBottomWidth: 1,

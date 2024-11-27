@@ -38,7 +38,7 @@ export default function TabLayout() {
           }}
         />
         <Tabs.Screen
-          name="profile/[id]"
+          name="profile"
           options={{
             tabBarIcon: ({ color, focused }) => (
               <AvatarIcon width={30} height={30} color={color} />

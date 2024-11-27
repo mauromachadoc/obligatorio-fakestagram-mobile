@@ -13,31 +13,12 @@ api.interceptors.request.use(
     const token = await getItem('token');
 
     if (token) {
-      config.headers = {
-        Authorization: `Bearer ${token}`
-      };
+      config.headers.set('Authorization', `Bearer ${token}`);
     }
-    console.log(config);
     return config;
   },
   (error) => {
     console.log('Error with request:', error);
-    return Promise.reject(error);
-  }
-);
-
-api.interceptors.response.use(
-  (response) => {
-    return response;
-  },
-  (error) => {
-    if (error.response.status === 401) {
-      removeItem('token');
-      removeItem('user');
-
-      router.navigate('/login');
-    }
-
     return Promise.reject(error);
   }
 );

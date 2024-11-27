@@ -14,7 +14,6 @@ export const addComment = async (postId: string, content: string) => {
 
 export const addPost = async (data: any) => {
   try {
-    console.log(data);
     const response = await api.post('/posts/upload', data, {
       headers: {
         'Content-Type': 'multipart/form-data',

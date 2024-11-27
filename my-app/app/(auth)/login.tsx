@@ -28,6 +28,7 @@ const Login: React.FC = () => {
         pathname: '/',
       });
     } catch (error) {
+      console.log(error);
       Alert.alert('Error', 'Hubo un problema al iniciar sesión');
     }
   }
@@ -61,8 +62,6 @@ const Login: React.FC = () => {
       })}>
         <Text style={styles.text}>Don't have an account? <Text style={styles.highlightedText}>Register</Text></Text>
       </Pressable>
-
-
     </View>
   );
 };
